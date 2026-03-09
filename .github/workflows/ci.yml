@@ -28,3 +28,32 @@ jobs:
         run: |
           python main.py --help
 
+  build-windows-exe:
+    runs-on: windows-latest
+    needs: build-and-smoke-test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies and PyInstaller
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build standalone executable
+        run: |
+          pyinstaller --onefile main.py -n jobhunter
+
+      - name: Upload artifact (Windows exe)
+        uses: actions/upload-artifact@v4
+        with:
+          name: jobhunter-windows-exe
+          path: dist/jobhunter.exe
+
