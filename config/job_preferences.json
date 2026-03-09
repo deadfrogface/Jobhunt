@@ -1,0 +1,24 @@
+{
+  "locations": [
+    "Elsdorf",
+    "Kerpen",
+    "Sindorf"
+  ],
+  "radius_km": 25,
+  "min_salary_gross_year": 37000,
+  "search_keywords": [
+    "IT Support",
+    "System Administrator",
+    "Helpdesk",
+    "IT"
+  ],
+  "job_boards": ["indeed", "stepstone", "linkedin"],
+  "hidden_job_queries": [
+    "site:jobs.personio.de \"IT Support\" Kerpen",
+    "site:boards.greenhouse.io \"System Administrator\" Köln",
+    "site:jobs.smartrecruiters.com \"Helpdesk\" Köln",
+    "site:jobs.lever.co Köln",
+    "site:apply.workable.com Kerpen"
+  ],
+  "include_jobs_without_location": false
+}

@@ -1,0 +1,20 @@
+# Secrets and user data
+config/.env
+config/lebenslauf.pdf
+config/arbeitszeugnisse.pdf
+
+# Data and outputs
+data/jobs/*.json
+data/applications.db
+outputs/anschreiben/*.txt
+outputs/interview_briefs/*.txt
+
+# Logs
+logs/*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
