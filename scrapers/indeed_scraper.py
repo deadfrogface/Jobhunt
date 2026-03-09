@@ -30,6 +30,28 @@ def _search_url(keyword: str, location: str, start: int = 0) -> str:
     return f"{BASE_URL}/jobs?{urllib.parse.urlencode(params)}"
 
 
+def _prepare_indeed_session(session: requests.Session) -> None:
+    """Add headers/cookies to better mimic a logged-in browser session.
+
+    If the user creates config/indeed_cookies.txt with a copied Cookie header
+    from their own browser session, it will be attached here. This does not
+    bypass fundamental blocking but can reduce 403 errors.
+    """
+    config_dir = PROJECT_ROOT / "config"
+    cookies_file = config_dir / "indeed_cookies.txt"
+    # Ensure referer and language headers are explicitly set
+    session.headers.setdefault("Referer", BASE_URL + "/")
+    session.headers.setdefault("Accept-Language", "de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7")
+    if cookies_file.is_file():
+        try:
+            cookie_value = cookies_file.read_text(encoding="utf-8").strip()
+            if cookie_value:
+                session.headers["Cookie"] = cookie_value
+                logger.info("Using cookies from %s for Indeed requests.", cookies_file)
+        except Exception as exc:
+            logger.warning("Could not read Indeed cookies file %s: %s", cookies_file, exc)
+
+
 def _parse_list_page(html: str, source: str) -> list[dict[str, Any]]:
     """Extract job cards from Indeed search results page. Selectors may need updates if Indeed changes layout."""
     jobs = []
@@ -82,9 +104,15 @@ def scrape_indeed(
     max_jobs_per_keyword: int = 20,
 ) -> list[dict[str, Any]]:
     """
-    Run Indeed search for each keyword x location. Returns list of standard job dicts.
+    Run Indeed search for each keyword x location. Returns list of job dicts.
+
+    Hinweis: Indeed setzt aggressive Bot-Protection ein. Dieser Scraper versucht,
+    sich wie ein Browser zu verhalten und erlaubt optional eigene Cookies
+    über config/indeed_cookies.txt. Wenn weiterhin 403-Fehler auftreten,
+    kannst du Indeed in config/job_preferences.json aus den job_boards entfernen.
     """
     session = get_session()
+    _prepare_indeed_session(session)
     seen_urls = set()
     all_jobs = []
     for keyword in keywords:

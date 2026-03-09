@@ -29,7 +29,7 @@ def get_session(
     backoff: float = 1.0,
     timeout: float = 15.0,
 ) -> requests.Session:
-    """Return a requests Session with retries and a random User-Agent."""
+    """Return a requests Session with retries and browser-like default headers."""
     session = requests.Session()
     retry = Retry(
         total=retries,
@@ -39,7 +39,16 @@ def get_session(
     adapter = HTTPAdapter(max_retries=retry)
     session.mount("https://", adapter)
     session.mount("http://", adapter)
-    session.headers.update({"User-Agent": random.choice(USER_AGENTS)})
+    # Try to look like a real browser
+    session.headers.update(
+        {
+            "User-Agent": random.choice(USER_AGENTS),
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+            "Accept-Language": "de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7",
+            "Connection": "keep-alive",
+            "Upgrade-Insecure-Requests": "1",
+        }
+    )
     return session
 
 
